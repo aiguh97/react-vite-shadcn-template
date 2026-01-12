@@ -176,15 +176,14 @@ const Asidebar = () => {
   }, [location.pathname]);
 
   const toggleMenu = (title) => {
-    setOpenMenus((prev) => {
-      // Kalau menu yang diklik sudah terbuka, tutup semuanya
-      if (prev[title]) {
-        return {};
-      }
-      // Kalau menu lain terbuka, tutup semua dan buka yang baru
-      return { [title]: true };
-    });
-  };
+  if (!open) return;
+
+  setOpenMenus((prev) => {
+    if (prev[title]) return {};
+    return { [title]: true };
+  });
+};
+
 
   return (
     <Sidebar collapsible="icon">
@@ -226,35 +225,36 @@ const Asidebar = () => {
                       <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild>
                           {item.submenu ? (
-                            <button
-                              onClick={() => toggleMenu(item.title)}
-                              className={`flex items-center gap-2 px-3 py-3 w-full rounded-md transition-colors max-w-[90%] ml-3 ${
-                                isActive
-                                  ? "bg-primary text-white font-medium hover:!bg-primary hover:!text-white"
-                                  : "text-gray-700 hover:bg-transparent"
-                              }`}
-                              style={{ height: 39 }}
-                            >
-                              <div className="flex flex-row gap-2 items-center">
-                                <item.icon size={18} />
-                                <span>{item.title}</span>
-                                {open && (
-                                  <div className="absolute right-4">
-                                    {isOpen ? (
-                                      <ChevronDown size={16} />
-                                    ) : (
-                                      <ChevronRight size={16} />
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                              <div
-                                className={`${
-                                  isActive && open ? "bg-primary" : ""
-                                } absolute w-[5px] right-0 top-0 rounded-tl-md rounded-bl-md`}
-                                style={{ height: "38px" }}
-                              />
-                            </button>
+                           <button
+  onClick={() => toggleMenu(item.title)}
+  className={`relative flex items-center w-full rounded-md transition-colors ml-3
+    ${open ? "gap-2 px-3" : "justify-center px-0"}
+    ${isActive
+      ? "bg-primary text-white font-medium hover:!bg-primary hover:!text-white"
+      : "text-gray-700 hover:bg-transparent"
+    }`}
+  style={{ height: 39 }}
+>
+  <item.icon size={18} />
+
+  {open && (
+    <>
+      <span className="whitespace-nowrap">{item.title}</span>
+      <div className="absolute right-4">
+        {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+      </div>
+    </>
+  )}
+
+  {/* garis kanan (TIDAK DIUBAH) */}
+  <div
+    className={`${
+      isActive && open ? "bg-primary" : ""
+    } absolute w-[5px] right-0 top-0 rounded-tl-md rounded-bl-md`}
+    style={{ height: "38px" }}
+  />
+</button>
+
                           ) : (
                             <Link
                               to={item.url}
@@ -269,6 +269,7 @@ const Asidebar = () => {
                                 <item.icon size={18} />
                                 {open && <span>{item.title}</span>}
                               </div>
+                              {/* garis kanan */}
                               {open && (
                                 <div
                                   className={`${
