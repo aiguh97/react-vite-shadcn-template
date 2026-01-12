@@ -225,29 +225,32 @@ const Asidebar = () => {
                     return (
                       <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild>
-                          {item.submenu ? (
-                            <button
-                              onClick={() => toggleMenu(item.title)}
-                              className={`flex items-center gap-2 px-3 py-3 w-full rounded-md transition-colors max-w-[90%] ml-3 ${
-                                isActive
-                                  ? "bg-primary text-white font-medium hover:!bg-primary hover:!text-white"
-                                  : "text-gray-700 hover:bg-transparent"
-                              }`}
-                              style={{ height: 39 }}
-                            >
-                              <div className="flex flex-row gap-2 items-center">
-                                <item.icon size={18} />
-                                <span>{item.title}</span>
-                                {open && (
-                                  <div className="absolute right-4">
-                                    {isOpen ? (
-                                      <ChevronDown size={16} />
-                                    ) : (
-                                      <ChevronRight size={16} />
-                                    )}
-                                  </div>
-                                )}
-                              </div>
+                         {item.submenu ? (
+  <button
+    onClick={() => open && toggleMenu(item.title)}
+    className={`flex items-center ${
+      open ? "gap-2 px-3" : "justify-center px-0"
+    } py-3 w-full rounded-md transition-colors ml-3 ${
+      isActive
+        ? "bg-primary text-white font-medium hover:!bg-primary hover:!text-white"
+        : "text-gray-700 hover:bg-transparent"
+    }`}
+    style={{ height: 39 }}
+  >
+
+                             <div className="flex items-center gap-2">
+  <item.icon size={18} />
+
+  {open && (
+    <>
+      <span>{item.title}</span>
+      <div className="absolute right-4">
+        {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+      </div>
+    </>
+  )}
+</div>
+
                               <div
                                 className={`${
                                   isActive && open ? "bg-primary" : ""
