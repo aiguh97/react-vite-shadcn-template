@@ -47,14 +47,10 @@ const IconSubmenu = ({ isSubActive }) => {
 
 const Asidebar = () => {
   const location = useLocation();
- const { open } = useSidebar();
-const [openMenu, setOpenMenu] = useState(null);
+  const { open } = useSidebar();
+  const [openMenus, setOpenMenus] = useState({});
 
-
-
-  
   const items = [
-    
     {
       name: "Home",
       menu: [
@@ -63,31 +59,6 @@ const [openMenu, setOpenMenu] = useState(null);
           url: "/",
           icon: Home,
         },
-      ],
-      submenu:[]
-    },
-     {
-      name: "FORMS & TABLES",
-      menu: [
-        {
-          title: "Table",
-          url: "/tables",
-          icon: Table,
-          submenu: [
-            {
-              title: "Table Standard",
-              url: "/tables/standard",
-              icon: IconSubmenu,
-            },
-            { title: "Table Shadcn", url: "/tables/shadcn", icon: IconSubmenu },
-            {
-              title: "Table Shadcn D&D",
-              url: "/tables/shadcn/drag-n-drop",
-              icon: IconSubmenu,
-            },
-          ],
-        },
-       
       ],
     },
     {
@@ -161,6 +132,7 @@ const [openMenu, setOpenMenu] = useState(null);
               icon: IconSubmenu,
             },
             { title: "Chart JS", url: "/charts/chartjs", icon: IconSubmenu },
+          
           ],
         },
         {
@@ -198,13 +170,13 @@ const [openMenu, setOpenMenu] = useState(null);
   useEffect(() => {
     items.forEach((item) => {
       if (item.submenu?.some((sub) => sub.url === location.pathname)) {
-        setOpenMenu((prev) => ({ ...prev, [item.title]: true }));
+        setOpenMenus((prev) => ({ ...prev, [item.title]: true }));
       }
     });
   }, [location.pathname]);
 
   const toggleMenu = (title) => {
-    setOpenMenu((prev) => {
+    setOpenMenus((prev) => {
       // Kalau menu yang diklik sudah terbuka, tutup semuanya
       if (prev[title]) {
         return {};
@@ -241,83 +213,108 @@ const [openMenu, setOpenMenu] = useState(null);
                     </div>
                   )}
 
-               {group.menu.map((item) => {
-  const isActive =
-    location.pathname === item.url ||
-    item.submenu?.some((sub) => sub.url === location.pathname);
+                  {group.menu.map((item) => {
+                    const isActive =
+                      location.pathname === item.url ||
+                      item.submenu?.some(
+                        (sub) => sub.url === location.pathname
+                      );
 
-  const isOpen = openMenu === item.title;
+                    const isOpen = openMenus[item.title] || false;
 
-  return (
-    <SidebarMenuItem key={item.title}>
-      <SidebarMenuButton asChild>
-        {item.submenu ? (
-          <button
-            onClick={() => open && toggleMenu(item.title)}
-            className={`flex items-center ${
-              open ? "gap-2 px-3" : "justify-center"
-            } py-3 w-full rounded-md ml-3 transition-colors ${
-              isActive
-                ? "bg-primary text-white"
-                : "text-gray-700"
-            }`}
-          >
-            <item.icon size={18} />
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild>
+                          {item.submenu ? (
+                            <button
+                              onClick={() => toggleMenu(item.title)}
+                              className={`flex items-center gap-2 px-3 py-3 w-full rounded-md transition-colors max-w-[90%] ml-3 ${
+                                isActive
+                                  ? "bg-primary text-white font-medium hover:!bg-primary hover:!text-white"
+                                  : "text-gray-700 hover:bg-transparent"
+                              }`}
+                              style={{ height: 39 }}
+                            >
+                              <div className="flex flex-row gap-2 items-center">
+                                <item.icon size={18} />
+                                <span>{item.title}</span>
+                                {open && (
+                                  <div className="absolute right-4">
+                                    {isOpen ? (
+                                      <ChevronDown size={16} />
+                                    ) : (
+                                      <ChevronRight size={16} />
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              <div
+                                className={`${
+                                  isActive && open ? "bg-primary" : ""
+                                } absolute w-[5px] right-0 top-0 rounded-tl-md rounded-bl-md`}
+                                style={{ height: "38px" }}
+                              />
+                            </button>
+                          ) : (
+                            <Link
+                              to={item.url}
+                              className={`mt-0.5 flex items-center gap-2 px-3 py-2 w-full rounded-md transition-colors max-w-[90%] ml-3 ${
+                                isActive
+                                  ? "bg-primary text-white font-medium hover:!bg-primary hover:!text-white"
+                                  : "text-gray-700 hover:bg-transparent"
+                              }`}
+                              style={{ height: 39 }}
+                            >
+                              <div className="flex flex-row gap-2">
+                                <item.icon size={18} />
+                                {open && <span>{item.title}</span>}
+                              </div>
+                              {open && (
+                                <div
+                                  className={`${
+                                    isActive ? "bg-primary" : ""
+                                  } absolute w-[5px] h-[90%] right-0 top-1 rounded-tl-md rounded-bl-md`}
+                                />
+                              )}
+                            </Link>
+                          )}
+                        </SidebarMenuButton>
 
-            {open && (
-              <>
-                <span>{item.title}</span>
-                <div className="ml-auto">
-                  {isOpen ? <ChevronDown /> : <ChevronRight />}
-                </div>
-              </>
-            )}
-          </button>
-        ) : (
-          <Link
-            to={item.url}
-            className={`flex items-center gap-2 px-3 py-2 ml-3 rounded-md ${
-              isActive
-                ? "bg-primary text-white"
-                : "text-gray-700"
-            }`}
-          >
-            <item.icon size={18} />
-            {open && <span>{item.title}</span>}
-          </Link>
-        )}
-      </SidebarMenuButton>
-
-      {/* SUBMENU */}
-      {item.submenu && open && (
-        <div
-          className={`ml-6 mt-1 transition-all overflow-hidden ${
-            isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          {item.submenu.map((sub) => {
-            const isSubActive = location.pathname === sub.url;
-            return (
-              <Link key={sub.title} to={sub.url}>
-                <div
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md ${
-                    isSubActive
-                      ? "bg-blue-100 text-blue-600"
-                      : "text-gray-600"
-                  }`}
-                >
-                  <IconSubmenu isSubActive={isSubActive} />
-                  {sub.title}
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-    </SidebarMenuItem>
-  );
-})}
-
+                        {/* Submenu */}
+                        {item.submenu && open && (
+                          <div
+                            className={`ml-[9px] mt-1 space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${
+                              isOpen
+                                ? "max-h-40 opacity-100"
+                                : "max-h-0 opacity-0"
+                            }`}
+                          >
+                            {item.submenu.map((sub) => {
+                              const isSubActive = location.pathname === sub.url;
+                              return (
+                                <Link
+                                  key={sub.title}
+                                  to={sub.url}
+                                  className="block text-sm px-5"
+                                >
+                                  <div
+                                    className={`flex items-center gap-2 py-2 px-3 rounded-md transition-colors ${
+                                      isSubActive
+                                        ? "bg-blue-100 text-blue-600 font-medium"
+                                        : "text-gray-600"
+                                    }`}
+                                  >
+                                    <sub.icon isSubActive={isSubActive} />
+                                    {sub.title}
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </SidebarMenuItem>
+                    );
+                  })}
                 </React.Fragment>
               ))}
             </SidebarMenu>
@@ -326,7 +323,7 @@ const [openMenu, setOpenMenu] = useState(null);
       </SidebarContent>
 
       {open && <MinguhCard />}
-      {/* <SidebarRail /> */}
+      <SidebarRail />
     </Sidebar>
   );
 };
