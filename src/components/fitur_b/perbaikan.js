@@ -1,0 +1,1 @@
+console.log("Hello from fitur_c component!");
