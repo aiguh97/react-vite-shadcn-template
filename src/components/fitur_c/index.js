@@ -1,0 +1,1 @@
+clg("Fitur B component loaded");

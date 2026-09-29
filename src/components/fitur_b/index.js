@@ -1,1 +1,1 @@
-clg("Fitur B component loaded");
+clg("Fitur C component loaded");
